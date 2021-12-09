@@ -44,6 +44,7 @@ function App() {
       <Options>
         <Notifications />
       </Options>
+      <span style={{ color: "white" }}> Made with ❤️ by Hetvi</span>
     </div>
   );
 }

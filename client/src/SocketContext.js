@@ -4,7 +4,7 @@ import Peer from "simple-peer";
 
 const SocketContext = createContext();
 
-const socket = io("http://localhost:5000");
+const socket = io("http://localhost:5000/");
 const ContextProvider = ({ children }) => {
   const [stream, setStream] = useState();
   const [me, setMe] = useState();
@@ -12,9 +12,11 @@ const ContextProvider = ({ children }) => {
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
   const [name, setName] = useState("");
+
   const myVideo = useRef();
   const otherUsersVideo = useRef();
   const connectionRef = useRef();
+
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
@@ -28,8 +30,9 @@ const ContextProvider = ({ children }) => {
     socket.on("me", (id) => {
       setMe(id);
     });
-    socket.on("calluser", ({ from, name: callerName, signal }) => {
-      setCall({ isReceived: true, from, name: callerName, signal });
+
+    socket.on("callUser", ({ from, name: callerName, signal }) => {
+      setCall({ isReceivingCall: true, from, name: callerName, signal });
     });
   }, []);
 
@@ -48,7 +51,7 @@ const ContextProvider = ({ children }) => {
   const callUser = (id) => {
     const peer = new Peer({ initiator: true, trickle: false, stream });
     peer.on("signal", (data) => {
-      socket.emit("calluser", {
+      socket.emit("callUser", {
         userToCall: id,
         signalData: data,
         from: me,
